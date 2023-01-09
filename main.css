@@ -7,15 +7,17 @@ body {
 
 music-stave::part(staveLine) {
 	stroke-width: 4px;
+	stroke-linecap: round;
 }
 
 music-stave::part(marker) {
-	fill: blue;
+	fill: firebrick;
 }
 
 music-stave::part(ledgerLine) {
-	stroke-width: 2px;
-	stroke: red;
+	stroke-width: 4px;
+	stroke: black;
+	stroke-linecap: round;
 }
 
 #keyboard {
