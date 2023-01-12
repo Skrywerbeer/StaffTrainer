@@ -7,7 +7,6 @@ class MusicStave extends HTMLElement {
 	private NUMBER_OF_STAVE_LINES = 5;
 	// NOTE: we add 2 to NUMBER_OF_STAVE_POSITIONS to compensate
 	// for the padding at the top and bottom;
-	private DY = 100/(this.NUMBER_OF_STAVE_POSITIONS + 2);
 
 	staveLines = [];
 	clef;
@@ -22,6 +21,12 @@ class MusicStave extends HTMLElement {
 	// ];
 	PITCH_CLASSES = ["A", "B", "C", "D", "E", "F", "G"];
 
+	addNotes(notes) {
+		let positions = [];
+		notes.forEach((note) => {positions.push(this.noteToPosition(note));});
+		this.drawMarkers(positions);
+	}
+
 	constructor() {
 		super();
 		this.attachShadow({mode: "open"});
@@ -33,7 +38,7 @@ class MusicStave extends HTMLElement {
 
 		this.shadowRoot.append(this.svg);
 	}
-	connectedCallback():void {
+	private connectedCallback():void {
 		const clef = this.getAttribute("clef");
 		if (clef === "treble") {
 			this.drawClef("Treble");
@@ -48,7 +53,7 @@ class MusicStave extends HTMLElement {
 		}
 	}
 
-	initSVG() {
+	private initSVG() {
 		this.svg = document.createElementNS("http://www.w3.org/2000/svg",
 											"svg");
 		this.svg.setAttribute("viewBox",
@@ -59,7 +64,7 @@ class MusicStave extends HTMLElement {
 
 	}
 
-	drawLine(x1: number, y1: number,
+	private drawLine(x1: number, y1: number,
 			 x2: number, y2: number,
 			 stroke: string="black"): SVGPolylineElement {
 		// NOTE: use a polyline to save on four .setAttribute calls.
@@ -74,7 +79,7 @@ class MusicStave extends HTMLElement {
 		return line;
 	}
 
-	drawStaveLines(): void {
+	private drawStaveLines(): void {
 		const x0 = 0;
 		const x1 = 100;
 		// // Ledger lines and the spaces in between.
@@ -89,17 +94,19 @@ class MusicStave extends HTMLElement {
 		}
 	}
 
-	drawClef(type: "Treble" | "Bass"): void {
+	private drawClef(type: "Treble" | "Bass"): void {
 		const clef = document.createElementNS("http://www.w3.org/2000/svg",
 											  "image");
 		let MAGIC_height;
 		let MAGIC_y;
 		if (type === "Treble") {
+			this.clefType = "Treble";
 			clef.setAttribute("href", "./trebleClef.svg");
 			MAGIC_height = 14.5;
 			MAGIC_y = 4;
 		}
 		else if (type === "Bass") {
+			this.clefType = "Bass";
 			clef.setAttribute("href", "./bassClef.svg");
 			MAGIC_height = 7.22;
 			MAGIC_y = 7;
@@ -112,6 +119,61 @@ class MusicStave extends HTMLElement {
 		this.svg.append(clef);
 	}
 
+	noteToPosition(note: string) {
+		switch (this.clefType) {
+			case ("Treble"):
+				switch (note.toUpperCase()) {
+					case ("E6"): return 0;
+					case ("D6"): return 1;
+					case ("C6"): return 2;
+					case ("B5"): return 3;
+					case ("A5"): return 4;
+					case ("G5"): return 5;
+					case ("F5"): return 6;
+					case ("E5"): return 7;
+					case ("D5"): return 8;
+					case ("C5"): return 9;
+					case ("B4"): return 10;
+					case ("A4"): return 11;
+					case ("G4"): return 12;
+					case ("F4"): return 13;
+					case ("E4"): return 14;
+					case ("D4"): return 15;
+					case ("C4"): return 16;
+					case ("B3"): return 17;
+					case ("A3"): return 18;
+					case ("G3"): return 19;
+					case ("F3"): return 20;
+				}
+				throw new Error(`Note (${note}) not in treble clef range.`);
+			case ("Bass"):
+				switch(note) {
+					case ("G4"): return 0;
+					case ("F4"): return 1;
+					case ("E4"): return 2;
+					case ("D4"): return 3;
+					case ("C4"): return 4;
+					case ("B3"): return 5;
+					case ("A3"): return 6;
+					case ("G3"): return 7;
+					case ("F3"): return 8;
+					case ("E3"): return 9;
+					case ("D3"): return 10;
+					case ("C2"): return 11;
+					case ("B2"): return 12;
+					case ("A2"): return 13;
+					case ("G2"): return 14;
+					case ("F2"): return 15;
+					case ("E2"): return 16;
+					case ("D2"): return 17;
+					case ("C1"): return 18;
+					case ("B1"): return 19;
+					case ("A1"): return 20;
+				}
+				throw new Error(`Note (${note}) not in bass clef range.`);
+		}
+	}
+	
 	private stavePositionToY(position: number): number {
 		return position + 1;
 	}
@@ -125,7 +187,7 @@ class MusicStave extends HTMLElement {
 			return false;
 	}
 
-	drawMarkers(...positions) {
+	drawMarkers(positions) {
 		if (positions.length === 0)
 			return;
 		const clefBox = this.clef.getBBox();
@@ -134,28 +196,29 @@ class MusicStave extends HTMLElement {
 		const dx = (100 - clefTotalWidth)/(positions.length + 1);
 		// TODO: add text element with note letter.
 		for (let i = 0; i < positions.length; ++i) {
+			const group = document.createElementNS("http://www.w3.org/2000/svg",
+												   "g");
+			this.svg.append(group);
 			const marker = document.createElementNS("http://www.w3.org/2000/svg",
 													"circle");
+			this.markers.push(marker);
+			group.append(marker);
 			const y = positions[i] + 1;
-			marker.setAttribute("r", `${Math.min(this.DY/3, 1)}`);
+			marker.setAttribute("r", `1%`);
 			marker.setAttribute("cx", `${x0 + dx*(i+1)}`);
 			marker.setAttribute("cy", `${y}`);
 			marker.setAttribute("class", "marker");
 			marker.setAttribute("part", "marker");
-			this.svg.append(marker);
-			// TODO: move to a seperate iteration over markers
-			// in seperate iteration add accidental decorators.
-			this.markers.push(this.addLedgerLine(marker, positions[i]));
+			this.addLedgerLine(group, positions[i])
 		}
 	}
 
-	private addLedgerLine(marker: SVGGraphicsElement,
-						   position: number): SVGGElement {
-		// NOTE: marker needs to be added to an <svg> to have coordinates.[O]
+	private addLedgerLine(group: SVGGElement,
+						  position: number): SVGGElement {
 		if (!this.positionOnLedgerLine(position))
-			return marker;
-
-		const box = marker.getBBox();
+			return group;
+		// NOTE: we assume the first child is the marker itself.
+		const box = (group.children[0] as SVGGraphicsElement).getBBox();
 		const LEDGER_LINE_EXT_LEN = box.width*0.5;
 		const x0 = box.x - LEDGER_LINE_EXT_LEN;
 		const x1 = box.x + box.width + LEDGER_LINE_EXT_LEN;
@@ -170,19 +233,8 @@ class MusicStave extends HTMLElement {
 			lines.push(line);
 			position += 2*incrementSign;
 		}
-		//const parent = marker.parentElement;
-		marker.remove()
-		const group = this.groupGrapics(...lines, marker);
-		//parent.append(group);
-		this.svg.append(group);
+		group.append(...lines);
 		return group
-	}
-
-	private groupGrapics(...graphics): SVGGElement {
-		const group = document.createElementNS("http://www.w3.org/2000/svg",
-											   "g");
-		group.append(...graphics);
-		return group;
 	}
 }
 customElements.define("music-stave", MusicStave);
