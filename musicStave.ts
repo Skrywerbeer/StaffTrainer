@@ -11,6 +11,7 @@ class MusicStave extends HTMLElement {
 
 	staveLines = [];
 	clef;
+	clefType: ("Treble" | "Bass");
 	markers = [];
 
 	private CLEF_MARGIN_HORZ = 1;
@@ -28,8 +29,23 @@ class MusicStave extends HTMLElement {
 		this.initSVG();
 		// TODO: read attributes from html.
 		this.drawStaveLines();
-		this.drawClef("Bass");
+		console.log(this.getAttribute("clef"));
+
 		this.shadowRoot.append(this.svg);
+	}
+	connectedCallback():void {
+		const clef = this.getAttribute("clef");
+		if (clef === "treble") {
+			this.drawClef("Treble");
+			this.clefType = "Treble";
+		}
+		else if (clef === "bass") {
+			this.drawClef("Bass");
+			this.clefType = "Bass";
+		}
+		else {
+			throw new Error(`Unsupported clef: "${clef}. defaulting to treble."`);
+		}
 	}
 
 	initSVG() {
@@ -88,10 +104,11 @@ class MusicStave extends HTMLElement {
 			MAGIC_height = 7.22;
 			MAGIC_y = 7;
 		}
+		clef.setAttribute("preserveAspectRatio", "xMinYMin");
 		clef.setAttribute("height", `${MAGIC_height}`);
 		clef.setAttribute("x", `${this.CLEF_MARGIN_HORZ}`);
 		clef.setAttribute("y", `${MAGIC_y}`);
-		this.clef = clef
+		this.clef = clef;
 		this.svg.append(clef);
 	}
 
@@ -111,7 +128,7 @@ class MusicStave extends HTMLElement {
 	drawMarkers(...positions) {
 		if (positions.length === 0)
 			return;
-		const clefBox = this.percentRect(this.clef);
+		const clefBox = this.clef.getBBox();
 		const clefTotalWidth = 2*this.CLEF_MARGIN_HORZ + clefBox.width;
 		const x0 = clefTotalWidth + clefBox.x;
 		const dx = (100 - clefTotalWidth)/(positions.length + 1);
@@ -138,7 +155,7 @@ class MusicStave extends HTMLElement {
 		if (!this.positionOnLedgerLine(position))
 			return marker;
 
-		const box = this.percentRect(marker);
+		const box = marker.getBBox();
 		const LEDGER_LINE_EXT_LEN = box.width*0.5;
 		const x0 = box.x - LEDGER_LINE_EXT_LEN;
 		const x1 = box.x + box.width + LEDGER_LINE_EXT_LEN;
@@ -166,14 +183,6 @@ class MusicStave extends HTMLElement {
 											   "g");
 		group.append(...graphics);
 		return group;
-	}
-	private percentRect(element: SVGGraphicsElement) {
-		const elementBox = element.getBBox();
-		const containerBox = this.svg.getBBox();
-		return {x: (elementBox.x/containerBox.width)*100,
-				y: (elementBox.y/containerBox.height)*100,
-				width: (elementBox.width/containerBox.width)*100,
-				height: (elementBox.height/containerBox.height)*100};
 	}
 }
 customElements.define("music-stave", MusicStave);
