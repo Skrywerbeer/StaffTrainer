@@ -30,12 +30,8 @@ class MusicStave extends HTMLElement {
 	constructor() {
 		super();
 		this.attachShadow({mode: "open"});
-
 		this.initSVG();
-		// TODO: read attributes from html.
 		this.drawStaveLines();
-		console.log(this.getAttribute("clef"));
-
 		this.shadowRoot.append(this.svg);
 	}
 	private connectedCallback():void {
@@ -228,8 +224,6 @@ class MusicStave extends HTMLElement {
 			else
 				y--;
 		}
-			
-		console.log(y);
 		while ((y < this.STAVE_FIRST_LINE_POS) ||
 			(y > this.STAVE_LAST_LINE_POS)) {
 			const line = this.drawLine(x0, y, x1, y);
