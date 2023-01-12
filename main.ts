@@ -17,4 +17,8 @@ function initKeyboard() {
 initKeyboard();
 
 const stave = document.getElementById("stave") as MusicStave;
-stave.drawMarkers(2, 10, 18);
+
+//stave.drawMarkers(2, 10, 18);
+const arr = [...(function*() {for (let i = 0; i < 21; ++i) yield i})()];
+console.log(arr);
+stave.drawMarkers(...arr);

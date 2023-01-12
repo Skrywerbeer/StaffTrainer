@@ -1,33 +1,19 @@
 class MusicStave extends HTMLElement {
 	svg;
-	get width() {return this.SVG_WIDTH;}
-	private SVG_WIDTH;
-	get height() {return this.SVG_HEIGHT;}
-	private SVG_HEIGHT;
-
-	private STAVE_WIDTH_RATIO = 0.8;
-	private STAVE_HEIGHT_RATIO = 0.90;
-	private STAVE_WIDTH;
-	private STAVE_HEIGHT;
-
 	private STAVE_FIRST_LINE_POS = 6;
 	private STAVE_LAST_LINE_POS = 14;
 
 	private NUMBER_OF_STAVE_POSITIONS = 21;
 	private NUMBER_OF_STAVE_LINES = 5;
-	// TODO: compensate for stroke width;
-	private DY;
-
-	private STAVE_MARGIN_HORZ_RATIO = 0.1;
-	//const STAVE_MARGIN_VERT_RATIO = 0.05;
-	private STAVE_MARGIN_HORZ;
-	private STAVE_MARGIN_VERT;
+	// NOTE: we add 2 to NUMBER_OF_STAVE_POSITIONS to compensate
+	// for the padding at the top and bottom;
+	private DY = 100/(this.NUMBER_OF_STAVE_POSITIONS + 2);
 
 	staveLines = [];
 	clef;
 	markers = [];
 
-	private CLEF_MARGIN_HORZ;
+	private CLEF_MARGIN_HORZ = 1;
 
 	// const PITCH_CLASSES = [
 	// 	"C / B♭", "C♯ / D♭", "D", "D♯ / E♭", "F / E♯",
@@ -42,142 +28,99 @@ class MusicStave extends HTMLElement {
 		this.initSVG();
 		// TODO: read attributes from html.
 		this.drawStaveLines();
-
+		this.drawClef("Bass");
 		this.shadowRoot.append(this.svg);
-		if (this.attributes["clef"]) {
-			if (this.attributes["clef"] === "treble")
-				this.drawTrebleClef();
-			else if (this.attributes["clef"] === "bass")
-				this.drawBassClef();
-
-		}
-		else {
-			this.drawTrebleClef();
-		}
 	}
 
 	initSVG() {
 		this.svg = document.createElementNS("http://www.w3.org/2000/svg",
 											"svg");
-		this.resizeSVG();
-	}
-	updateSizeInfo() {
-		this.SVG_WIDTH = document.body.clientWidth*0.6;
-		this.SVG_HEIGHT = this.SVG_WIDTH*0.3;
-		this.STAVE_WIDTH = this.SVG_WIDTH*this.STAVE_WIDTH_RATIO;
-		this.STAVE_HEIGHT = this.SVG_HEIGHT*this.STAVE_HEIGHT_RATIO;
-		this.DY = this.STAVE_HEIGHT/this.NUMBER_OF_STAVE_POSITIONS;
-		this.STAVE_MARGIN_HORZ = this.SVG_WIDTH*this.STAVE_MARGIN_HORZ_RATIO;
-		this.STAVE_MARGIN_VERT = this.DY;
-		this.CLEF_MARGIN_HORZ = this.STAVE_WIDTH*0.01;
-	}
-	resizeSVG() {
-		this.updateSizeInfo();
 		this.svg.setAttribute("viewBox",
-							  `0 0 ${this.SVG_WIDTH} ${this.SVG_HEIGHT}`);
-		this.svg.setAttribute("width", `${this.SVG_WIDTH}`);
-		this.svg.setAttribute("height", `${this.SVG_HEIGHT}`);
+							  `0 0 100 ${this.NUMBER_OF_STAVE_POSITIONS + 2}`);
+		this.svg.setAttribute("preserveAspectRatio", "none");
+		this.svg.setAttribute("width", "100%");
+		this.svg.setAttribute("height", "100%");
+
 	}
 
 	drawLine(x1: number, y1: number,
-					  x2: number, y2: number,
-					  stroke: string="black"): SVGPolylineElement {
+			 x2: number, y2: number,
+			 stroke: string="black"): SVGPolylineElement {
 		// NOTE: use a polyline to save on four .setAttribute calls.
 		const line = document.createElementNS("http://www.w3.org/2000/svg",
 											  "polyline");
 		line.setAttribute("points", `${x1} ${y1}, ${x2} ${y2}`);
 		line.setAttribute("fill", "none");
 		line.setAttribute("stroke", `${stroke}`);
+		line.setAttribute("stroke-width", "2%");
+		line.setAttribute("vector-effect", "non-scaling-stroke");
 		this.svg.appendChild(line);
 		return line;
 	}
 
 	drawStaveLines(): void {
-		const x0 = this.STAVE_MARGIN_HORZ;
-		const x1 = this.STAVE_MARGIN_HORZ + this.STAVE_WIDTH;
+		const x0 = 0;
+		const x1 = 100;
 		// // Ledger lines and the spaces in between.
-		const y0 = this.STAVE_MARGIN_VERT + this.STAVE_FIRST_LINE_POS*this.DY;
-		//const y0 = STAVE_MARGIN_VERT;
-
+		const y0 = this.STAVE_FIRST_LINE_POS + 1;
 		//const NUMBER_OF_STAVE_LINES = 21;
 		for (let i = 0; i < this.NUMBER_OF_STAVE_LINES; ++i) {
-			const y = y0+2*this.DY*i;
+			const y = y0 + 2*i;
 			const line = this.drawLine(x0, y, x1, y);
 			line.setAttribute("class", "staveLine")
 			line.setAttribute("part", "staveLine");
 			this.staveLines.push(line);
 		}
 	}
-	resizeStave() {
-		const x0 = this.STAVE_MARGIN_HORZ;
-		const x1 = this.STAVE_MARGIN_HORZ + this.STAVE_WIDTH;
-		// // Ledger lines and the spaces in between.
-		const y0 = this.STAVE_MARGIN_VERT + this.STAVE_FIRST_LINE_POS*this.DY;
-		for (let i = 0; i < this.staveLines.length; ++i) {
-			const y = y0+2*this.DY*i;
-			this.staveLines[i].setAttribute("points",
-											`${x0} ${y}, ${x1}, ${y}`);
-		}
-	}
 
-	drawTrebleClef(): void {
-		const x = this.STAVE_MARGIN_HORZ + this.CLEF_MARGIN_HORZ;
-		const POSITIONS_TO_BASELINE = 14;
-
+	drawClef(type: "Treble" | "Bass"): void {
 		const clef = document.createElementNS("http://www.w3.org/2000/svg",
-											  "text");
-		clef.textContent = "𝄞";
-		// MAGIC_RATIO is the ratio of the distance between the clef's baseline,
-		// which sits on the last stave line, to the second stave line in px
-		// to the clef's font size in px.
-		const MAGIC_RATIO = 0.2497;
-		const SIZE = (2*this.DY)/(MAGIC_RATIO);
-		clef.style.fontSize = `${SIZE}px`;
-		const y = this.STAVE_MARGIN_VERT + POSITIONS_TO_BASELINE*this.DY;
-		clef.setAttribute("x", `${x}`);
-		clef.setAttribute("y", `${y}`);
+											  "image");
+		let MAGIC_height;
+		let MAGIC_y;
+		if (type === "Treble") {
+			clef.setAttribute("href", "./trebleClef.svg");
+			MAGIC_height = 14.5;
+			MAGIC_y = 4;
+		}
+		else if (type === "Bass") {
+			clef.setAttribute("href", "./bassClef.svg");
+			MAGIC_height = 7.22;
+			MAGIC_y = 7;
+		}
+		clef.setAttribute("height", `${MAGIC_height}`);
+		clef.setAttribute("x", `${this.CLEF_MARGIN_HORZ}`);
+		clef.setAttribute("y", `${MAGIC_y}`);
 		this.clef = clef
 		this.svg.append(clef);
 	}
 
-	drawBassClef(): void {
-		const x = this.STAVE_MARGIN_HORZ + this.CLEF_MARGIN_HORZ;
-		const POSITIONS_TO_BASELINE = 14;
-		const clef = document.createElementNS("http://www.w3.org/2000/svg",
-											  "text");
-		clef.textContent = "𝄢";
-		// In the case of the bass clef MAGIC_RATIO is
-		// the ratio of the distance between the clef's two
-		// dot's centers to the clef's font size.
-		// The two dots stradle the F line thus 2*this.DY.
-		const MAGIC_RATIO = 0.2200;
-		const SIZE = (2*this.DY)/(MAGIC_RATIO);
-		clef.style.fontSize = `${SIZE}px`;
-		const y = this.STAVE_MARGIN_VERT + POSITIONS_TO_BASELINE*this.DY;
-		clef.setAttribute("x", `${x}`);
-		clef.setAttribute("y", `${y}`);
-		this.clef = clef;
-		this.svg.append(clef);
-	}
-
-	
-
 	private stavePositionToY(position: number): number {
-		return this.STAVE_MARGIN_VERT + position*this.DY;
+		return position + 1;
+	}
+	private positionOnLedgerLine(position: number): boolean {
+		const isEven = ((position % 2) === 0);
+		if ((position < this.STAVE_FIRST_LINE_POS) && isEven)
+			return true;
+		else if ((position > this.STAVE_LAST_LINE_POS ) && isEven)
+			return true;
+		else
+			return false;
 	}
 
 	drawMarkers(...positions) {
 		if (positions.length === 0)
 			return;
-		const clefTotalWidth = 2*this.CLEF_MARGIN_HORZ +
-			this.clef.getBBox().width;
-		const x0 = this.STAVE_MARGIN_HORZ + clefTotalWidth;
-		const dx = (this.STAVE_WIDTH - clefTotalWidth)/(positions.length + 1);
+		const clefBox = this.percentRect(this.clef);
+		const clefTotalWidth = 2*this.CLEF_MARGIN_HORZ + clefBox.width;
+		const x0 = clefTotalWidth + clefBox.x;
+		const dx = (100 - clefTotalWidth)/(positions.length + 1);
+		// TODO: add text element with note letter.
 		for (let i = 0; i < positions.length; ++i) {
 			const marker = document.createElementNS("http://www.w3.org/2000/svg",
 													"circle");
-			const y = this.stavePositionToY(positions[i]);
-			marker.setAttribute("r", "8");
+			const y = positions[i] + 1;
+			marker.setAttribute("r", `${Math.min(this.DY/3, 1)}`);
 			marker.setAttribute("cx", `${x0 + dx*(i+1)}`);
 			marker.setAttribute("cy", `${y}`);
 			marker.setAttribute("class", "marker");
@@ -192,31 +135,29 @@ class MusicStave extends HTMLElement {
 	private addLedgerLine(marker: SVGGraphicsElement,
 						   position: number): SVGGElement {
 		// NOTE: marker needs to be added to an <svg> to have coordinates.[O]
-		if (((position <= this.STAVE_FIRST_LINE_POS) ||
-			(position >= this.STAVE_LAST_LINE_POS)) && (position % 2) === 1)
+		if (!this.positionOnLedgerLine(position))
 			return marker;
-		const box = marker.getBBox();
-		const LEDGER_LINE_EXT_LEN = box.width/2;
+
+		const box = this.percentRect(marker);
+		const LEDGER_LINE_EXT_LEN = box.width*0.5;
 		const x0 = box.x - LEDGER_LINE_EXT_LEN;
 		const x1 = box.x + box.width + LEDGER_LINE_EXT_LEN;
-		const y = box.y + box.width/2;
+		const y = position + 1;
 		let lines = [];
-		// pos < STAVE_FIRSTLINE ||
-		//     STAVE_LAST_LINE_POS < pos < NUMBER_OF_STAVE_POSITIONS
 		const incrementSign = (position > this.STAVE_LAST_LINE_POS ? -1 : 1);
 		for (let i = 0; (position < this.STAVE_FIRST_LINE_POS) ||
 			(position > this.STAVE_LAST_LINE_POS); ++i) {
-			const dy = 2*i*this.DY*incrementSign;
-			const line = this.drawLine(x0, y + dy, x1, y + dy);
+			const line = this.drawLine(x0, position + 1, x1, position + 1);
 			line.setAttribute("class", "ledgerLine");
 			line.setAttribute("part", "ledgerLine");
 			lines.push(line);
 			position += 2*incrementSign;
 		}
-		const parent = marker.parentElement;
+		//const parent = marker.parentElement;
 		marker.remove()
 		const group = this.groupGrapics(...lines, marker);
-		parent.append(group);
+		//parent.append(group);
+		this.svg.append(group);
 		return group
 	}
 
@@ -225,6 +166,14 @@ class MusicStave extends HTMLElement {
 											   "g");
 		group.append(...graphics);
 		return group;
+	}
+	private percentRect(element: SVGGraphicsElement) {
+		const elementBox = element.getBBox();
+		const containerBox = this.svg.getBBox();
+		return {x: (elementBox.x/containerBox.width)*100,
+				y: (elementBox.y/containerBox.height)*100,
+				width: (elementBox.width/containerBox.width)*100,
+				height: (elementBox.height/containerBox.height)*100};
 	}
 }
 customElements.define("music-stave", MusicStave);

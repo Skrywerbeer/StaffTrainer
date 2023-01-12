@@ -1,8 +1,15 @@
 body {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+	display: grid;
+	grid-template-rows: 1fr 2fr 3fr;
+	grid-template-columns: 1fr 2fr 1fr;
+
 	background-color: darkslateblue;
+	
+}
+
+music-stave {
+	grid-row: 1 / 3;
+	grid-column: 1 / 4;
 }
 
 music-stave::part(staveLine) {
@@ -12,6 +19,11 @@ music-stave::part(staveLine) {
 
 music-stave::part(marker) {
 	fill: firebrick;
+	transition: fill 500ms;
+}
+
+music-stave::part(marker):hover {
+	fill: royalblue;
 }
 
 music-stave::part(ledgerLine) {
@@ -21,6 +33,9 @@ music-stave::part(ledgerLine) {
 }
 
 #keyboard {
+	grid-row: 3 / 4;
+	grid-column: 2 / 3;
+	
 	margin-top: 5%;
 	width: 30%;
 	display: grid;
