@@ -11,7 +11,7 @@ class MusicStave extends HTMLElement {
 	staveLines = [];
 	clef;
 	clefType: ("Treble" | "Bass");
-	markers = [];
+	markerGroups = [];
 
 	private CLEF_MARGIN_HORZ = 1;
 
@@ -57,7 +57,7 @@ class MusicStave extends HTMLElement {
 		this.svg = document.createElementNS("http://www.w3.org/2000/svg",
 											"svg");
 		this.svg.setAttribute("viewBox",
-							  `0 0 100 ${this.NUMBER_OF_STAVE_POSITIONS + 2}`);
+							  `0 -2 100 ${this.NUMBER_OF_STAVE_POSITIONS + 4}`);
 		this.svg.setAttribute("preserveAspectRatio", "none");
 		this.svg.setAttribute("width", "100%");
 		this.svg.setAttribute("height", "100%");
@@ -83,7 +83,7 @@ class MusicStave extends HTMLElement {
 		const x0 = 0;
 		const x1 = 100;
 		// // Ledger lines and the spaces in between.
-		const y0 = this.STAVE_FIRST_LINE_POS + 1;
+		const y0 = this.STAVE_FIRST_LINE_POS;
 		//const NUMBER_OF_STAVE_LINES = 21;
 		for (let i = 0; i < this.NUMBER_OF_STAVE_LINES; ++i) {
 			const y = y0 + 2*i;
@@ -147,7 +147,7 @@ class MusicStave extends HTMLElement {
 				}
 				throw new Error(`Note (${note}) not in treble clef range.`);
 			case ("Bass"):
-				switch(note) {
+				switch(note.toUpperCase()) {
 					case ("G4"): return 0;
 					case ("F4"): return 1;
 					case ("E4"): return 2;
@@ -175,7 +175,7 @@ class MusicStave extends HTMLElement {
 	}
 	
 	private stavePositionToY(position: number): number {
-		return position + 1;
+		return position;
 	}
 	private positionOnLedgerLine(position: number): boolean {
 		const isEven = ((position % 2) === 0);
@@ -187,7 +187,7 @@ class MusicStave extends HTMLElement {
 			return false;
 	}
 
-	drawMarkers(positions) {
+	private drawMarkers(positions) {
 		if (positions.length === 0)
 			return;
 		const clefBox = this.clef.getBBox();
@@ -198,43 +198,57 @@ class MusicStave extends HTMLElement {
 		for (let i = 0; i < positions.length; ++i) {
 			const group = document.createElementNS("http://www.w3.org/2000/svg",
 												   "g");
+			this.markerGroups.push(group);
 			this.svg.append(group);
 			const marker = document.createElementNS("http://www.w3.org/2000/svg",
 													"circle");
-			this.markers.push(marker);
 			group.append(marker);
-			const y = positions[i] + 1;
-			marker.setAttribute("r", `1%`);
+			const y = positions[i];
+			marker.setAttribute("r", `2%`);
 			marker.setAttribute("cx", `${x0 + dx*(i+1)}`);
 			marker.setAttribute("cy", `${y}`);
 			marker.setAttribute("class", "marker");
 			marker.setAttribute("part", "marker");
-			this.addLedgerLine(group, positions[i])
+			this.addLedgerLines(group);
 		}
 	}
 
-	private addLedgerLine(group: SVGGElement,
-						  position: number): SVGGElement {
-		if (!this.positionOnLedgerLine(position))
-			return group;
+	private addLedgerLines(group: SVGGElement): SVGGElement {
 		// NOTE: we assume the first child is the marker itself.
 		const box = (group.children[0] as SVGGraphicsElement).getBBox();
 		const LEDGER_LINE_EXT_LEN = box.width*0.5;
 		const x0 = box.x - LEDGER_LINE_EXT_LEN;
 		const x1 = box.x + box.width + LEDGER_LINE_EXT_LEN;
-		const y = position + 1;
 		let lines = [];
-		const incrementSign = (position > this.STAVE_LAST_LINE_POS ? -1 : 1);
-		for (let i = 0; (position < this.STAVE_FIRST_LINE_POS) ||
-			(position > this.STAVE_LAST_LINE_POS); ++i) {
-			const line = this.drawLine(x0, position + 1, x1, position + 1);
+		const incrementSign = (box.y > this.STAVE_LAST_LINE_POS ? -1 : 1);
+		let y = Math.round(box.height/2 + box.y);
+		if ((y % 2) === 1) {
+			if (incrementSign > 0)
+				y++;
+			else
+				y--;
+		}
+			
+		console.log(y);
+		while ((y < this.STAVE_FIRST_LINE_POS) ||
+			(y > this.STAVE_LAST_LINE_POS)) {
+			const line = this.drawLine(x0, y, x1, y);
 			line.setAttribute("class", "ledgerLine");
 			line.setAttribute("part", "ledgerLine");
 			lines.push(line);
-			position += 2*incrementSign;
+			y += 2*incrementSign;
 		}
 		group.append(...lines);
 		return group
 	}
+	// private addLedgerLinesDown(group: SVGGElement): SVGGElement {
+	// 	const box = (group.children[0] as SVGGraphicsElement).getBBox();
+	// 	const LEDGER_LINE_EXT_LEN = box.width*0.5;
+	// 	const x0 = box.x - LEDGER_LINE_EXT_LEN;
+	// 	const x1 = box.x + box.width + LEDGER_LINE_EXT_LEN;
+	// 	const y0 = box.y;
+	// }
+	// private addLedgerLinesUp
+	
 }
 customElements.define("music-stave", MusicStave);
