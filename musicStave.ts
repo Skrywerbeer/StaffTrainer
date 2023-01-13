@@ -195,6 +195,7 @@ class MusicStave extends HTMLElement {
 		for (let i = 0; i < positions.length; ++i) {
 			const group = document.createElementNS("http://www.w3.org/2000/svg",
 												   "g");
+			group.setAttribute("part", "markerGroup");
 			this.markerGroups.push(group);
 			this.svg.append(group);
 			const marker = document.createElementNS("http://www.w3.org/2000/svg",
@@ -204,7 +205,6 @@ class MusicStave extends HTMLElement {
 			marker.setAttribute("r", `2%`);
 			marker.setAttribute("cx", `${x0 + dx*(i+1)}`);
 			marker.setAttribute("cy", `${y}`);
-			marker.setAttribute("class", "marker");
 			marker.setAttribute("part", "marker");
 			this.addLedgerLines(group);
 		}
@@ -230,7 +230,6 @@ class MusicStave extends HTMLElement {
 		while ((y < this.STAVE_FIRST_LINE_POS) ||
 			(y > this.STAVE_LAST_LINE_POS)) {
 			const line = this.drawLine(x0, y, x1, y);
-			line.setAttribute("class", "ledgerLine");
 			line.setAttribute("part", "ledgerLine");
 			lines.push(line);
 			y += 2*incrementSign;
