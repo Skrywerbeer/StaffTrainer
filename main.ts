@@ -75,13 +75,12 @@ function clickHandler(event) {
 		newGame();
 	}
 }
-//newGame();
-const TREBLE_NOTES = [
-	...noteRange(3, "F"),
-	...noteRange(4),
-	...noteRange(5),
-	...noteRange(6, "C", "E")
-];
+newGame();
+// const TREBLE_NOTES = [
+// 	...noteRange(3, "F"),
+// 	...noteRange(4),
+// 	...noteRange(5),
+// 	...noteRange(6, "C", "E")
+// ];
 //stave.addNotes(TREBLE_NOTES);
-stave.addNotes(["E6", "D6", "C6"]);
-stave.addNotes(["F3", "A3", "B3"]);
+//stave.addNotes(["C4","D4"]);
