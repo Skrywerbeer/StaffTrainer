@@ -216,14 +216,16 @@ class MusicStave extends HTMLElement {
 		const x0 = box.x - LEDGER_LINE_EXT_LEN;
 		const x1 = box.x + box.width + LEDGER_LINE_EXT_LEN;
 		let lines = [];
-		const incrementSign = (box.y > this.STAVE_LAST_LINE_POS ? -1 : 1);
 		let y = Math.round(box.height/2 + box.y);
+		const incrementSign = (y > this.STAVE_LAST_LINE_POS ? -1 : 1);
+
 		if ((y % 2) === 1) {
 			if (incrementSign > 0)
 				y++;
 			else
 				y--;
 		}
+		let counter = 0;
 		while ((y < this.STAVE_FIRST_LINE_POS) ||
 			(y > this.STAVE_LAST_LINE_POS)) {
 			const line = this.drawLine(x0, y, x1, y);
@@ -231,6 +233,8 @@ class MusicStave extends HTMLElement {
 			line.setAttribute("part", "ledgerLine");
 			lines.push(line);
 			y += 2*incrementSign;
+			if (counter++ === 1000)
+				throw new Error("Something went wrong while adding ledger lines.");
 		}
 		group.append(...lines);
 		return group
