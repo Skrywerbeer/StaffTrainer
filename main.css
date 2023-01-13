@@ -1,10 +1,31 @@
+@keyframes opening {
+	from {
+		grid-template-columns: 1fr 0fr 1fr;
+		opacity: 0;
+	}
+	to {
+		grid-template-columns: 1fr 2fr 1fr;
+		opacity: 1;
+	}
+}
+
 body {
 	display: grid;
 	grid-template-rows: 30vh 1fr;
 	grid-template-columns: 1fr 2fr 1fr;
-
 	background-color: darkslateblue;
-	
+
+	animation: 800ms 1 forwards opening;
+	animation-timing-function: linear;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
 }
 
 music-stave {
@@ -13,14 +34,16 @@ music-stave {
 }
 
 music-stave::part(staveLine) {
-	stroke-width: 2%;
+	stroke-width: 8%;
 	stroke-linecap: round;
 }
 
 music-stave::part(marker) {
 	fill: firebrick;
-	
 	transition: fill 500ms;
+	animation-duration: 200ms;
+	animation-name: fadeIn;
+	animation-iteration-count: 1;
 }
 
 music-stave::part(marker):hover {
@@ -28,7 +51,7 @@ music-stave::part(marker):hover {
 }
 
 music-stave::part(ledgerLine) {
-	stroke-width: 1%;
+	stroke-width: 8%;
 	stroke: black;
 	stroke-linecap: round;
 }
