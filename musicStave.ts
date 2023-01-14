@@ -9,7 +9,7 @@ class MusicStave extends HTMLElement {
 	// for the padding at the top and bottom;
 
 	staveLines = [];
-	clef;
+	clef = null;
 	clefType: ("Treble" | "Bass");
 	markerGroups = [];
 
@@ -33,6 +33,7 @@ class MusicStave extends HTMLElement {
 		this.initSVG();
 		this.drawStaveLines();
 		this.shadowRoot.append(this.svg);
+		this.addEventListener("attributechanged", () => {console.log("haha");});
 	}
 	private connectedCallback():void {
 		const clef = this.getAttribute("clef");
@@ -47,6 +48,24 @@ class MusicStave extends HTMLElement {
 		else {
 			throw new Error(`Unsupported clef: "${clef}. defaulting to treble."`);
 		}
+	}
+	private attributeChangedCallback(attr, previous, current): void {
+		if (attr === "clef") {
+			if (current === "treble") {
+				this.drawClef("Treble");
+				this.clefType = "Treble";
+			}
+			else if (current === "bass") {
+				this.drawClef("Bass");
+				this.clefType = "Bass";
+			}
+			else {
+				throw new Error(`Unsupported clef: "${current}."`);
+			}
+		}
+	}
+	static get observedAttributes() {
+		return ["clef"]
 	}
 
 	private initSVG() {
@@ -91,6 +110,8 @@ class MusicStave extends HTMLElement {
 	}
 
 	private drawClef(clefType: "Treble" | "Bass"): void {
+		if (this.clef !== null)
+			this.clef.remove();
 		let MAGIC_height;
 		let MAGIC_y;
 		if (clefType === "Treble") {
