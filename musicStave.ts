@@ -177,14 +177,14 @@ class MusicStave extends HTMLElement {
 					case ("F3"): return 8;
 					case ("E3"): return 9;
 					case ("D3"): return 10;
-					case ("C2"): return 11;
+					case ("C3"): return 11;
 					case ("B2"): return 12;
 					case ("A2"): return 13;
 					case ("G2"): return 14;
 					case ("F2"): return 15;
 					case ("E2"): return 16;
 					case ("D2"): return 17;
-					case ("C1"): return 18;
+					case ("C2"): return 18;
 					case ("B1"): return 19;
 					case ("A1"): return 20;
 				}
