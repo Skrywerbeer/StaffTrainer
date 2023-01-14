@@ -20,7 +20,24 @@ function randomArrayElement(array: any): any {
 	return array[Math.round(Math.random()*(array.length-1))];
 }
 
-function* TrebleNoteGen(n: number = -1) {
+function* FrequencyLUT() {
+	const NUMBER_OF_OCTAVES = 6;
+	const FIRST_OCTAVE = 1;
+	const INTERVALS = [0, 2, 4, 5, 7, 9, 10];
+	const C0_FREQ = 16.35159*4;// Transpose up two octaves
+	for (let i = FIRST_OCTAVE; i < NUMBER_OF_OCTAVES + FIRST_OCTAVE; ++i) {
+		const notes = [...noteRange(i)]
+		for (let j = 0; j < notes.length; ++j)
+			yield {note: notes[j],
+				   frequency: C0_FREQ*Math.pow(2, (12*i + INTERVALS[j])/12)};
+	}
+}
+
+let LUT = new Map();
+for (const entry of [...FrequencyLUT()])
+	LUT.set(entry.note, entry.frequency);
+
+function* TrebleNoteGen(n: number=-1) {
 	const TREBLE_NOTES = [
 		...noteRange(3, "F"),
 		...noteRange(4),
@@ -29,6 +46,17 @@ function* TrebleNoteGen(n: number = -1) {
 	];
 	for (let i = 0; i < n; ++i)
 		yield randomArrayElement(TREBLE_NOTES);
+}
+
+function* BassNoteGen(n: number=-1) {
+	const BASS_NOTES = [
+		...noteRange(1, "A"),
+		...noteRange(2),
+		...noteRange(3),
+		...noteRange(4, "C", "G")
+	];
+	for (let i = 0; i < n; ++i)
+		yield randomArrayElement(BASS_NOTES);
 }
 
 // const PITCH_CLASSES = [
@@ -57,23 +85,6 @@ const NUMBER_OF_NOTES = 4;
 let notes = [];
 let noteIndex = 0;
 
-function* FrequencyLUT() {
-	const NUMBER_OF_OCTAVES = 6;
-	const FIRST_OCTAVE = 1;
-	// const LUT = [];
-	const INTERVALS = [0, 2, 4, 5, 7, 9, 10];
-	const C0_FREQ = 16.35159*4;// Transpose up two octaves
-	for (let i = FIRST_OCTAVE; i < NUMBER_OF_OCTAVES + FIRST_OCTAVE; ++i) {
-		const notes = [...noteRange(i)]
-		for (let j = 0; j < notes.length; ++j)
-			// LUT.push({note: notes[j],
-			// 		  frequency: C1_FREQ*Math.pow(2, 12*i + INTERVALS[j])});
-			yield {note: notes[j],
-				   frequency: C0_FREQ*Math.pow(2, (12*i + INTERVALS[j])/12)};
-	}
-}
-const LUT = [...FrequencyLUT()];
-
 function newGame() {
 	notes = [...TrebleNoteGen(NUMBER_OF_NOTES)];
 	console.log(`New notes: ${notes}`);
@@ -86,13 +97,6 @@ function clickHandler(event) {
 	if (letter === notes[noteIndex].charAt(0)) {
 		const marker = stave.markerGroups.shift();
 		marker.remove();
-		
-		const note = LUT.find((element) => {
-			if (element.note === notes[noteIndex])
-				return true;
-		});
-		if (note === undefined)
-			console.log(":O panic");
 		if (audioCtx.state === "suspended")
 			audioCtx.resume();
 		const TONE_LENGTH = 0.3;
@@ -102,7 +106,7 @@ function clickHandler(event) {
 		gain.gain.setTargetAtTime(0, audioCtx.currentTime, TONE_LENGTH/2);
 		const osc = new OscillatorNode(audioCtx, {
 			type: "sine",
-			frequency: note.frequency,
+			frequency: LUT.get(notes[noteIndex])
 		});
 		osc.connect(gain);
 		osc.start(audioCtx.currentTime);
@@ -114,6 +118,7 @@ function clickHandler(event) {
 		newGame();
 	}
 }
+//stave.setAttribute("clef", "haha");
 newGame();
 // const TREBLE_NOTES = [
 // 	...noteRange(3, "F"),
