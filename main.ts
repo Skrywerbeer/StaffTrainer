@@ -95,13 +95,18 @@ function clickHandler(event) {
 			console.log(":O panic");
 		if (audioCtx.state === "suspended")
 			audioCtx.resume();
+		const TONE_LENGTH = 0.3;
+		const gain = audioCtx.createGain();
+		gain.connect(audioCtx.destination);
+		gain.gain.value = 1;
+		gain.gain.setTargetAtTime(0, audioCtx.currentTime, TONE_LENGTH/2);
 		const osc = new OscillatorNode(audioCtx, {
 			type: "sine",
 			frequency: note.frequency,
 		});
-		osc.connect(audioCtx.destination);
+		osc.connect(gain);
 		osc.start(audioCtx.currentTime);
-		osc.stop(audioCtx.currentTime + 0.2);
+		osc.stop(audioCtx.currentTime + TONE_LENGTH);
 		noteIndex++;
 	}
 	
