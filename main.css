@@ -13,9 +13,9 @@
 	}
 }
 
-@keyframes backgroundAnim {
+@keyframes glitter {
 	from {
-		opacity: 0;
+		opacity: 0.4;
 	}
 	to {
 		opacity: 1;
@@ -36,15 +36,6 @@ body {
 	animation-timing-function: linear;
 }
 
-@keyframes fadeIn {
-	from {
-		stroke: black;
-	}
-	to {
-		stroke: darkorange;
-	}
-}
-
 music-stave {
 	grid-row: 1 / 1;
 	grid-column: 2 / 3;
@@ -54,44 +45,56 @@ music-stave::part(staveLine) {
 	stroke-width: 4%;
 	stroke-linecap: round;
 }
-
-music-stave::part(marker) {
-	fill: none;
-	stroke: darkslateblue;
-	stroke-width: 0.5%;
-	/* transition: fill 500ms; */
-	animation-duration: 200ms;
-	animation-name: fadeIn;
-	animation-iteration-count: 1;
+@keyframes fadeIn {
+	from {
+		opacity: 0.2;
+	}
+	to {
+		opacity: 1;
+	}
 }
-
-music-stave::part(marker):hover {
-	fill: royalblue;
+music-stave::part(marker) {
+	stroke-width: 0.5%;
+	stroke: black;
+	fill: #f3d2aa;
 }
 
 music-stave::part(ledgerLine) {
 	stroke-width: 6%;
-	stroke: black;
+	/* stroke: black; */
 	stroke-linecap: round;
+
 }
+
+music-stave::part(markerGroup) {
+	/* stroke: red; */
+}
+
 
 #keyboard {
 	grid-row: 2 / 3;
 	grid-column: 2 / 3;
-	margin-top: 5%;
-	display: grid;
-	grid-template-rows: repeat(3, 1fr);
-	grid-template-columns: repeat(4, 1fr);
-	grid-gap: 10%;
+	margin-top: 2%;
+	/* display: grid; */
+	/* grid-template-rows: repeat(3, 1fr); */
+	/* grid-template-columns: repeat(4, 1fr); */
+	/* grid-gap: 10%; */
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+	margin-bottom: 10vh;
 }
 
 #keyboard button {
+	width: 10vw;
+	margin: 1vw;
 	aspect-ratio: 1;
 	font-size: 150%;
 	font-weight: bolder;
 	background-color: royalblue;
 	border: black solid 2px;
-	border-radius: 5%;
+	border-radius: 8px;
 	transition: background-color 50ms,
 				transform 100ms;
 }
