@@ -86,7 +86,16 @@ let notes = [];
 let noteIndex = 0;
 
 function newGame() {
-	notes = [...TrebleNoteGen(NUMBER_OF_NOTES)];
+	const dice = Math.random();
+	if (dice < 0.5) {
+		stave.setAttribute("clef", "treble");
+		notes = [...TrebleNoteGen(NUMBER_OF_NOTES)];
+	}
+	else {
+		stave.setAttribute("clef", "bass");
+		notes = [...BassNoteGen(NUMBER_OF_NOTES)];
+	}
+
 	console.log(`New notes: ${notes}`);
 	noteIndex = 0;
 	stave.addNotes(notes);
@@ -118,7 +127,6 @@ function clickHandler(event) {
 		newGame();
 	}
 }
-//stave.setAttribute("clef", "haha");
 newGame();
 // const TREBLE_NOTES = [
 // 	...noteRange(3, "F"),
