@@ -21,10 +21,23 @@ class MusicStave extends HTMLElement {
 	// ];
 	PITCH_CLASSES = ["A", "B", "C", "D", "E", "F", "G"];
 
-	addNotes(notes) {
+	addNotes(notes): void {
 		let positions = [];
 		notes.forEach((note) => {positions.push(this.noteToPosition(note));});
 		this.drawMarkers(positions);
+	}
+
+	clearNotes(): void {
+		this.markerGroups.forEach((group) => {group.remove();});
+	}
+	
+	popNote(): void {
+		const group = this.markerGroups.shift();
+		if (group) {
+			const anim = document.createElementNS("http://www.w3.org/2000/svg",
+													   "animate");
+			// anim.setAttribut
+		}
 	}
 
 	constructor() {
@@ -71,11 +84,11 @@ class MusicStave extends HTMLElement {
 	private initSVG() {
 		this.svg = document.createElementNS("http://www.w3.org/2000/svg",
 											"svg");
-		this.svg.setAttribute("viewBox",
+		this.svg.setAttributeNS(null, "viewBox",
 							  `0 -2 100 ${this.NUMBER_OF_STAVE_POSITIONS + 4}`);
-		this.svg.setAttribute("preserveAspectRatio", "none");
-		this.svg.setAttribute("width", "100%");
-		this.svg.setAttribute("height", "100%");
+		this.svg.setAttributeNS(null, "preserveAspectRatio", "none");
+		this.svg.setAttributeNS(null, "width", "100%");
+		this.svg.setAttributeNS(null, "height", "100%");
 
 	}
 
@@ -85,11 +98,11 @@ class MusicStave extends HTMLElement {
 		// NOTE: use a polyline to save on four .setAttribute calls.
 		const line = document.createElementNS("http://www.w3.org/2000/svg",
 											  "polyline");
-		line.setAttribute("points", `${x1} ${y1}, ${x2} ${y2}`);
-		line.setAttribute("fill", "none");
-		line.setAttribute("stroke", `${stroke}`);
-		line.setAttribute("stroke-width", "2%");
-		line.setAttribute("vector-effect", "non-scaling-stroke");
+		line.setAttributeNS(null, "points", `${x1} ${y1}, ${x2} ${y2}`);
+		line.setAttributeNS(null, "fill", "none");
+		line.setAttributeNS(null, "stroke", `${stroke}`);
+		line.setAttributeNS(null, "stroke-width", "2%");
+		line.setAttributeNS(null, "vector-effect", "non-scaling-stroke");
 		this.svg.appendChild(line);
 		return line;
 	}
@@ -103,8 +116,8 @@ class MusicStave extends HTMLElement {
 		for (let i = 0; i < this.NUMBER_OF_STAVE_LINES; ++i) {
 			const y = y0 + 2*i;
 			const line = this.drawLine(x0, y, x1, y);
-			line.setAttribute("class", "staveLine")
-			line.setAttribute("part", "staveLine");
+			line.setAttributeNS(null, "class", "staveLine")
+			line.setAttributeNS(null, "part", "staveLine");
 			this.staveLines.push(line);
 		}
 	}
@@ -129,15 +142,15 @@ class MusicStave extends HTMLElement {
 			MAGIC_y = 6;
 		}
 		const clef = this.svg.getElementById("clef");
-		clef.setAttribute("preserveAspectRatio", "xMinYMin");
-		clef.setAttribute("height", `${MAGIC_height}`);
-		clef.setAttribute("x", `${this.CLEF_MARGIN_HORZ}`);
-		clef.setAttribute("y", `${MAGIC_y}`);
+		clef.setAttributeNS(null, "preserveAspectRatio", "xMinYMin");
+		clef.setAttributeNS(null, "height", `${MAGIC_height}`);
+		clef.setAttributeNS(null, "x", `${this.CLEF_MARGIN_HORZ}`);
+		clef.setAttributeNS(null, "y", `${MAGIC_y}`);
 		this.clef = clef;
 		this.svg.append(clef);
 	}
 
-	noteToPosition(note: string) {
+	private noteToPosition(note: string) {
 		switch (this.clefType) {
 			case ("Treble"):
 				switch (note.toUpperCase()) {
@@ -216,17 +229,17 @@ class MusicStave extends HTMLElement {
 		for (let i = 0; i < positions.length; ++i) {
 			const group = document.createElementNS("http://www.w3.org/2000/svg",
 												   "g");
-			group.setAttribute("part", "markerGroup");
+			group.setAttributeNS(null, "part", "markerGroup");
 			this.markerGroups.push(group);
 			this.svg.append(group);
 			const marker = document.createElementNS("http://www.w3.org/2000/svg",
 													"circle");
 			group.append(marker);
 			const y = positions[i];
-			marker.setAttribute("r", `2%`);
-			marker.setAttribute("cx", `${x0 + dx*(i+1)}`);
-			marker.setAttribute("cy", `${y}`);
-			marker.setAttribute("part", "marker");
+			marker.setAttributeNS(null, "r", `2%`);
+			marker.setAttributeNS(null, "cx", `${x0 + dx*(i+1)}`);
+			marker.setAttributeNS(null, "cy", `${y}`);
+			marker.setAttributeNS(null, "part", "marker");
 			this.addLedgerLines(group);
 		}
 	}
@@ -251,7 +264,7 @@ class MusicStave extends HTMLElement {
 		while ((y < this.STAVE_FIRST_LINE_POS) ||
 			(y > this.STAVE_LAST_LINE_POS)) {
 			const line = this.drawLine(x0, y, x1, y);
-			line.setAttribute("part", "ledgerLine");
+			line.setAttributeNS(null, "part", "ledgerLine");
 			lines.push(line);
 			y += 2*incrementSign;
 			if (counter++ === 1000)
@@ -263,8 +276,8 @@ class MusicStave extends HTMLElement {
 
 	TREBLE_CLEF_SVG_STRING = `
 <svg id="clef" viewBox="0 0 1.2601 3.5572">
- <g transform="translate(-74.467 -56.429)" stroke-width=".26458" aria-label="𝄞">
-  <path d="m75.012 57.517c-0.09463-0.33098-0.11072-0.72517 0.11125-1.0108 0.0863-0.16098 0.2238-0.03821 0.25732 0.08838 0.17806 0.39836 0.06839 0.90329-0.24914 1.2004 0.02402 0.11531 0.04805 0.23061 0.07207 0.34592 0.21494-0.05089 0.42264 0.10959 0.48942 0.30815 0.09243 0.23825-0.0043 0.55131-0.25236 0.64976-0.08014 0.06304 0.03188 0.23185 0.02612 0.33756 0.04179 0.15918 0.03769 0.35568-0.10469 0.4649-0.18747 0.15761-0.54956 0.09338-0.60893-0.16424-0.03763-0.13352 0.0481-0.30945 0.20337-0.29692 0.18348-0.0096 0.26871 0.26686 0.11646 0.36612-0.04331 0.04513-0.1916 0.0076-0.07792 0.0802 0.15922 0.09099 0.38013-0.01768 0.41139-0.19722 0.04045-0.18605-0.04643-0.36621-0.07309-0.54768-0.3735 0.10428-0.77132-0.18446-0.84668-0.55257-0.06186-0.25043 0.03136-0.51014 0.1871-0.70689 0.10091-0.13179 0.22215-0.24738 0.33832-0.36505zm0.05559-0.05148c0.14179-0.09725 0.22009-0.26343 0.28415-0.41799 0.04016-0.10088 0.07091-0.33118-0.09458-0.31632-0.13887 0.05525-0.18382 0.22157-0.21498 0.35396-0.02464 0.12671-0.02374 0.25928 0.02541 0.38035zm0.11737 0.9204c-0.16702 0.03858-0.27848 0.25298-0.17321 0.4023 0.0231 0.0568 0.22408 0.16625 0.05891 0.11865-0.19223-0.07593-0.27239-0.32027-0.18425-0.50241 0.03354-0.12628 0.1843-0.19433 0.24487-0.26937-0.01848-0.09621-0.03695-0.19242-0.05543-0.28863-0.23418 0.18948-0.46913 0.44564-0.46301 0.76615 0.0056 0.30372 0.32349 0.54286 0.61744 0.48167 0.10807 0.01246 0.08847-0.06072 0.06861-0.13189-0.03797-0.19215-0.07594-0.38431-0.11392-0.57646zm0.19973 0.66713c0.24121-0.0957 0.27766-0.48555 0.05357-0.62083-0.05873-0.03996-0.23435-0.10594-0.17454 0.01961 0.04033 0.20041 0.08065 0.40082 0.12098 0.60122z"/>
+<g transform="translate(-74.467 -56.429)" stroke-width=".26458" aria-label="𝄞">
+<path d="m75.012 57.517c-0.09463-0.33098-0.11072-0.72517 0.11125-1.0108 0.0863-0.16098 0.2238-0.03821 0.25732 0.08838 0.17806 0.39836 0.06839 0.90329-0.24914 1.2004 0.02402 0.11531 0.04805 0.23061 0.07207 0.34592 0.21494-0.05089 0.42264 0.10959 0.48942 0.30815 0.09243 0.23825-0.0043 0.55131-0.25236 0.64976-0.08014 0.06304 0.03188 0.23185 0.02612 0.33756 0.04179 0.15918 0.03769 0.35568-0.10469 0.4649-0.18747 0.15761-0.54956 0.09338-0.60893-0.16424-0.03763-0.13352 0.0481-0.30945 0.20337-0.29692 0.18348-0.0096 0.26871 0.26686 0.11646 0.36612-0.04331 0.04513-0.1916 0.0076-0.07792 0.0802 0.15922 0.09099 0.38013-0.01768 0.41139-0.19722 0.04045-0.18605-0.04643-0.36621-0.07309-0.54768-0.3735 0.10428-0.77132-0.18446-0.84668-0.55257-0.06186-0.25043 0.03136-0.51014 0.1871-0.70689 0.10091-0.13179 0.22215-0.24738 0.33832-0.36505zm0.05559-0.05148c0.14179-0.09725 0.22009-0.26343 0.28415-0.41799 0.04016-0.10088 0.07091-0.33118-0.09458-0.31632-0.13887 0.05525-0.18382 0.22157-0.21498 0.35396-0.02464 0.12671-0.02374 0.25928 0.02541 0.38035zm0.11737 0.9204c-0.16702 0.03858-0.27848 0.25298-0.17321 0.4023 0.0231 0.0568 0.22408 0.16625 0.05891 0.11865-0.19223-0.07593-0.27239-0.32027-0.18425-0.50241 0.03354-0.12628 0.1843-0.19433 0.24487-0.26937-0.01848-0.09621-0.03695-0.19242-0.05543-0.28863-0.23418 0.18948-0.46913 0.44564-0.46301 0.76615 0.0056 0.30372 0.32349 0.54286 0.61744 0.48167 0.10807 0.01246 0.08847-0.06072 0.06861-0.13189-0.03797-0.19215-0.07594-0.38431-0.11392-0.57646zm0.19973 0.66713c0.24121-0.0957 0.27766-0.48555 0.05357-0.62083-0.05873-0.03996-0.23435-0.10594-0.17454 0.01961 0.04033 0.20041 0.08065 0.40082 0.12098 0.60122z"/>
  </g>
 </svg>
 `
