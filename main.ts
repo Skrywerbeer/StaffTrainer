@@ -104,8 +104,9 @@ const audioCtx = new AudioContext();
 function clickHandler(event) {
 	const letter = event.target.textContent;
 	if (letter === notes[noteIndex].charAt(0)) {
-		const marker = stave.markerGroups.shift();
-		marker.remove();
+		// const marker = stave.markerGroups.shift();
+		// marker.remove();
+		stave.popNote();
 		if (audioCtx.state === "suspended")
 			audioCtx.resume();
 		const TONE_LENGTH = 0.3;

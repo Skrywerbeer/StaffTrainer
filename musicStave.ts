@@ -34,9 +34,13 @@ class MusicStave extends HTMLElement {
 	popNote(): void {
 		const group = this.markerGroups.shift();
 		if (group) {
-			const anim = document.createElementNS("http://www.w3.org/2000/svg",
-													   "animate");
-			// anim.setAttribut
+			const fade = this.newFadeOutAnimation();
+			group.append(fade);
+			const float = this.newFloatAnimiation();
+			float.addEventListener("endEvent", () => {group.remove();});
+			group.querySelector("circle").append(float);
+			fade.beginElement();
+			float.beginElement();
 		}
 	}
 
@@ -231,6 +235,8 @@ class MusicStave extends HTMLElement {
 												   "g");
 			group.setAttributeNS(null, "part", "markerGroup");
 			this.markerGroups.push(group);
+			const anim = this.newFadeInAnimation();
+			group.append(anim);
 			this.svg.append(group);
 			const marker = document.createElementNS("http://www.w3.org/2000/svg",
 													"circle");
@@ -241,12 +247,13 @@ class MusicStave extends HTMLElement {
 			marker.setAttributeNS(null, "cy", `${y}`);
 			marker.setAttributeNS(null, "part", "marker");
 			this.addLedgerLines(group);
+			anim.beginElement();
 		}
 	}
 
 	private addLedgerLines(group: SVGGElement): SVGGElement {
 		// NOTE: we assume the first child is the marker itself.
-		const box = (group.children[0] as SVGGraphicsElement).getBBox();
+		const box = (group.querySelector("circle") as SVGGraphicsElement).getBBox();
 		const LEDGER_LINE_EXT_LEN = box.width*0.5;
 		const x0 = box.x - LEDGER_LINE_EXT_LEN;
 		const x1 = box.x + box.width + LEDGER_LINE_EXT_LEN;
@@ -272,6 +279,43 @@ class MusicStave extends HTMLElement {
 		}
 		group.prepend(...lines);
 		return group
+	}
+	private newFloatAnimiation(): SVGAnimateElement {
+		const anim = document.createElementNS("http://www.w3.org/2000/svg",
+											  "animateTransform");
+		anim.setAttributeNS(null, "attributeName", "transform");
+		anim.setAttributeNS(null, "type", "translate");
+		anim.setAttributeNS(null, "dur", "400ms");
+		anim.setAttributeNS(null, "from", "0 0");
+		anim.setAttributeNS(null, "to", "0 -4");
+		anim.setAttributeNS(null, "fill", "freeze");
+		anim.setAttributeNS(null, "repeatCount", "1");
+		anim.setAttributeNS(null, "begin", "indefinte");
+		return anim;
+	}
+	private newFadeInAnimation(): SVGAnimateElement {
+		const anim = document.createElementNS("http://www.w3.org/2000/svg",
+											  "animate");
+		anim.setAttributeNS(null, "attributeName", "opacity");
+		anim.setAttributeNS(null, "dur", "800ms");
+		anim.setAttributeNS(null, "from", "0");
+		anim.setAttributeNS(null, "to", "1");
+		anim.setAttributeNS(null, "fill", "freeze");
+		anim.setAttributeNS(null, "repeatCount", "1");
+		anim.setAttributeNS(null, "begin", "indefinte");
+		return anim;
+	}
+	private newFadeOutAnimation(): SVGAnimateElement {
+		const anim = document.createElementNS("http://www.w3.org/2000/svg",
+											  "animate");
+		anim.setAttributeNS(null, "attributeName", "opacity");
+		anim.setAttributeNS(null, "dur", "400ms");
+		anim.setAttributeNS(null, "from", "1");
+		anim.setAttributeNS(null, "to", "0");
+		anim.setAttributeNS(null, "fill", "freeze");
+		anim.setAttributeNS(null, "repeatCount", "1");
+		anim.setAttributeNS(null, "begin", "indefinte");
+		return anim;
 	}
 
 	TREBLE_CLEF_SVG_STRING = `
