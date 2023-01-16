@@ -257,17 +257,9 @@ class MusicStave extends HTMLElement {
 			if (counter++ === 1000)
 				throw new Error("Something went wrong while adding ledger lines.");
 		}
-		group.append(...lines);
+		group.prepend(...lines);
 		return group
 	}
-	// private addLedgerLinesDown(group: SVGGElement): SVGGElement {
-	// 	const box = (group.children[0] as SVGGraphicsElement).getBBox();
-	// 	const LEDGER_LINE_EXT_LEN = box.width*0.5;
-	// 	const x0 = box.x - LEDGER_LINE_EXT_LEN;
-	// 	const x1 = box.x + box.width + LEDGER_LINE_EXT_LEN;
-	// 	const y0 = box.y;
-	// }
-	// private addLedgerLinesUp
 
 	TREBLE_CLEF_SVG_STRING = `
 <svg id="clef" viewBox="0 0 1.2601 3.5572">
