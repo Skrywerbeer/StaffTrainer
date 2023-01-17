@@ -1,5 +1,6 @@
 class MusicStave extends HTMLElement {
-	svg;
+	svg: SVGElement = document.createElementNS("http://www.w3.org/2000/svg",
+											   "svg");;
 	private STAVE_FIRST_LINE_POS = 6;
 	private STAVE_LAST_LINE_POS = 14;
 
@@ -8,10 +9,10 @@ class MusicStave extends HTMLElement {
 	// NOTE: we add 2 to NUMBER_OF_STAVE_POSITIONS to compensate
 	// for the padding at the top and bottom;
 
-	staveLines = [];
-	clef = null;
-	clefType: ("Treble" | "Bass");
-	markerGroups = [];
+	staveLines: Array<SVGGraphicsElement> = [];
+	clef: SVGGraphicsElement | null = null;
+	clefType: ("Treble" | "Bass") = "Treble";
+	markerGroups: Array<SVGGElement> = [];
 
 	private CLEF_MARGIN_HORZ = 1;
 
@@ -21,24 +22,26 @@ class MusicStave extends HTMLElement {
 	// ];
 	PITCH_CLASSES = ["A", "B", "C", "D", "E", "F", "G"];
 
-	addNotes(notes): void {
-		let positions = [];
+	addNotes(notes: Array<string>): void {
+		let positions: Array<number> = [];
 		notes.forEach((note) => {positions.push(this.noteToPosition(note));});
 		this.drawMarkers(positions);
 	}
 
 	clearNotes(): void {
-		this.markerGroups.forEach((group) => {group.remove();});
+		this.markerGroups.forEach((group: SVGGElement) => {group.remove();});
 	}
 	
 	popNote(): void {
-		const group = this.markerGroups.shift();
+		if (this.markerGroups.length <= 0)
+			throw new Error("Stave has no notes to pop.");
+		const group: SVGGElement = this.markerGroups.shift()!;
 		if (group) {
 			const fade = this.newFadeOutAnimation();
 			group.append(fade);
 			const float = this.newFloatAnimiation();
 			float.addEventListener("endEvent", () => {group.remove();});
-			group.querySelector("circle").append(float);
+			(group.querySelector("circle")!).append(float);
 			fade.beginElement();
 			float.beginElement();
 		}
@@ -49,7 +52,7 @@ class MusicStave extends HTMLElement {
 		this.attachShadow({mode: "open"});
 		this.initSVG();
 		this.drawStaveLines();
-		this.shadowRoot.append(this.svg);
+		(this.shadowRoot!).append(this.svg);
 		this.addEventListener("attributechanged", () => {console.log("haha");});
 	}
 	private connectedCallback():void {
@@ -66,7 +69,9 @@ class MusicStave extends HTMLElement {
 			throw new Error(`Unsupported clef: "${clef}. defaulting to treble."`);
 		}
 	}
-	private attributeChangedCallback(attr, previous, current): void {
+	private attributeChangedCallback(attr: string,
+									 previous: string,
+									 current: string): void {
 		if (attr === "clef") {
 			if (current === "treble") {
 				this.drawClef("Treble");
@@ -86,8 +91,6 @@ class MusicStave extends HTMLElement {
 	}
 
 	private initSVG() {
-		this.svg = document.createElementNS("http://www.w3.org/2000/svg",
-											"svg");
 		this.svg.setAttributeNS(null, "viewBox",
 							  `0 -2 100 ${this.NUMBER_OF_STAVE_POSITIONS + 4}`);
 		this.svg.setAttributeNS(null, "preserveAspectRatio", "none");
@@ -145,7 +148,7 @@ class MusicStave extends HTMLElement {
 			MAGIC_height = 6.88;
 			MAGIC_y = 6;
 		}
-		const clef = this.svg.getElementById("clef");
+		const clef: SVGGraphicsElement = this.svg.querySelector("#clef")!;
 		clef.setAttributeNS(null, "preserveAspectRatio", "xMinYMin");
 		clef.setAttributeNS(null, "height", `${MAGIC_height}`);
 		clef.setAttributeNS(null, "x", `${this.CLEF_MARGIN_HORZ}`);
@@ -222,17 +225,20 @@ class MusicStave extends HTMLElement {
 			return false;
 	}
 
-	private drawMarkers(positions) {
+	private drawMarkers(positions: Array<number>) {
 		if (positions.length === 0)
 			return;
+		if (this.clef === null)
+			throw new Error("Marker position indeterminite without a clef");
 		const clefBox = this.clef.getBBox();
 		const clefTotalWidth = 2*this.CLEF_MARGIN_HORZ + clefBox.width;
 		const x0 = clefTotalWidth + clefBox.x;
 		const dx = (100 - clefTotalWidth)/(positions.length + 1);
 		// TODO: add text element with note letter.
 		for (let i = 0; i < positions.length; ++i) {
-			const group = document.createElementNS("http://www.w3.org/2000/svg",
-												   "g");
+			const group: SVGGElement =
+				document.createElementNS("http://www.w3.org/2000/svg",
+										 "g");
 			group.setAttributeNS(null, "part", "markerGroup");
 			this.markerGroups.push(group);
 			const anim = this.newFadeInAnimation();
