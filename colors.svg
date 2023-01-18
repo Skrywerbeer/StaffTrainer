@@ -26,9 +26,9 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:lockguides="true"
-     inkscape:zoom="0.5946522"
-     inkscape:cx="409.48306"
-     inkscape:cy="540.65217"
+     inkscape:zoom="1.1893044"
+     inkscape:cx="347.68223"
+     inkscape:cy="339.27395"
      inkscape:window-width="1440"
      inkscape:window-height="853"
      inkscape:window-x="0"
@@ -84,5 +84,26 @@
            x="68.212677"
            y="77.394875">Background gradient</tspan></text>
     </g>
+    <rect
+       style="fill:#e5973a;fill-opacity:1;stroke:none;stroke-width:0.0264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:0"
+       id="rect300"
+       width="24.872314"
+       height="23.800108"
+       x="109.03028"
+       y="77.650375" />
+    <rect
+       style="fill:#975914;fill-opacity:1;stroke:none;stroke-width:0.0264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:0"
+       id="rect2100"
+       width="24.872314"
+       height="23.800108"
+       x="109.03028"
+       y="101.45049" />
+    <rect
+       style="fill:#f3d2aa;fill-opacity:1;stroke:none;stroke-width:0.0264583;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:0"
+       id="rect2102"
+       width="24.872314"
+       height="23.800108"
+       x="109.03028"
+       y="53.850266" />
   </g>
 </svg>
