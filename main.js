@@ -56,12 +56,9 @@ const PITCH_CLASSES = ["A", "B", "C", "D", "E", "F", "G"];
 const KEYBOARD = document.getElementById("keyboard");
 function initKeyboard() {
     let keys = [];
-    for (let i = 0; i < PITCH_CLASSES.length; ++i) {
-        const newKey = document.createElement("button");
-        newKey.textContent = PITCH_CLASSES[i];
-        KEYBOARD.append(newKey);
-        newKey.addEventListener("click", clickHandler);
-    }
+    document.querySelectorAll(".key.normal").forEach((key) => {
+        key.addEventListener("click", clickHandler);
+    });
 }
 initKeyboard();
 const stave = document.getElementById("stave");
@@ -84,7 +81,8 @@ function newGame() {
 }
 const audioCtx = new AudioContext();
 function clickHandler(event) {
-    const letter = event.target.textContent;
+    const letter = event.target.dataset["note"];
+    console.log(letter);
     if (letter === notes[noteIndex].charAt(0)) {
         stave.popNote();
         if (audioCtx.state === "suspended")

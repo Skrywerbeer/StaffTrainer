@@ -33,16 +33,13 @@ body {
 }
 
 #game {
-	display: grid;
-	grid-template-rows: 30vh 1fr;
-	grid-template-columns: 1fr 2fr 1fr;
-	animation: 800ms 1 forwards opening;
-	animation-timing-function: linear;
+	display: flex;
+	flex-direction: column;
 }
 
 music-stave {
-	grid-row: 1 / 1;
-	grid-column: 2 / 3;
+	height: 40vh;
+	margin: 0 5vw;
 }
 
 music-stave::part(staveLine) {
@@ -95,4 +92,24 @@ music-stave::part(markerGroup) {
 #keyboard button:active {
 	background-color: gray;
 	transform: scale(0.8);
+}
+
+svg {
+	height: 30vh;
+	width: 75vw;
+	border: black solid 1px;
+	align-self: center;
+}
+
+
+svg .key.normal {
+	fill: ivory;
+}
+
+svg .key.accent {
+	fill: #333333;
+}
+
+svg .key:hover {
+	fill: royalblue;
 }
