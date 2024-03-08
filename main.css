@@ -25,6 +25,18 @@
 	}
 }
 
+@keyframes flash {
+	from {
+		fill: whitesmoke;
+	}
+	50% {
+		fill: #fa0013;
+	}
+	to {
+		fill: whitesmoke;
+	}
+}
+
 body {
 	/* background-image: linear-gradient(30deg, */
 	/* 								  #5c83b9 60%, */
@@ -75,6 +87,7 @@ music-stave::part(nextNote) {
 	stroke: black;
 	/* fill: #f3d2aa; */
 	fill: white;
+	animation: 1.2s ease-in-out flash infinite;
 }
 
 svg {
