@@ -55,7 +55,6 @@ function* BassNoteGen(n = -1) {
 const PITCH_CLASSES = ["A", "B", "C", "D", "E", "F", "G"];
 const KEYBOARD = document.getElementById("keyboard");
 function initKeyboard() {
-    let keys = [];
     document.querySelectorAll(".key.normal").forEach((key) => {
         key.addEventListener("click", clickHandler);
     });

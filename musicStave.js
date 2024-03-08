@@ -15,6 +15,7 @@ class MusicStave extends HTMLElement {
         let positions = [];
         notes.forEach((note) => { positions.push(this.noteToPosition(note)); });
         this.drawMarkers(positions);
+        this.markNextInLine();
     }
     clearNotes() {
         this.markerGroups.forEach((group) => { group.remove(); });
@@ -31,6 +32,7 @@ class MusicStave extends HTMLElement {
             (group.querySelector("circle")).append(float);
             fade.beginElement();
             float.beginElement();
+            this.markNextInLine();
         }
     }
     constructor() {
@@ -217,6 +219,13 @@ class MusicStave extends HTMLElement {
             marker.setAttributeNS(null, "part", "marker");
             this.addLedgerLines(group);
             anim.beginElement();
+        }
+    }
+    markNextInLine() {
+        if (this.markerGroups.length > 0) {
+            const next = this.markerGroups[0].
+                querySelector("music-stave::part(marker)");
+            next.setAttributeNS(null, "part", `${next.getAttributeNS(null, "part")} nextNote`);
         }
     }
     addLedgerLines(group) {

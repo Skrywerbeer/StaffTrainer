@@ -26,15 +26,23 @@
 }
 
 body {
-	background-image: linear-gradient(30deg,
-									  #5c83b9 60%,
-									  #e5973a 90%);
+	/* background-image: linear-gradient(30deg, */
+	/* 								  #5c83b9 60%, */
+	/* 								  #e5973a 90%); */
+	background-image: linear-gradient(to bottom,
+									  whitesmoke 80%,
+									  #225f44 );
+	/* background-image: radial-gradient(circle at center, */
+	/* 								  #333333 80%, */
+	/* 								  #225f44 90%); */
 	height: 100vh;
 }
 
 #game {
+	height: 100%;
 	display: flex;
 	flex-direction: column;
+	justify-content: space-around;
 }
 
 music-stave {
@@ -50,64 +58,41 @@ music-stave::part(staveLine) {
 music-stave::part(marker) {
 	stroke-width: 0.5%;
 	stroke: black;
-	fill: #f3d2aa;
+	fill: #333333;
 }
 
 music-stave::part(ledgerLine) {
 	stroke-width: 6%;
-	/* stroke: black; */
+	stroke: #fa0013;
 	stroke-linecap: round;
-
 }
 
 music-stave::part(markerGroup) {
-	/* stroke: red; */
+
 }
 
-
-#keyboard {
-	grid-row: 2 / 3;
-	grid-column: 2 / 3;
-	margin-top: 2%;
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	justify-content: center;
-	margin-bottom: 10vh;
-}
-
-#keyboard button {
-	width: 10vw;
-	margin: 1vw;
-	aspect-ratio: 1;
-	font-size: 150%;
-	font-weight: bolder;
-	background-color: royalblue;
-	border: black solid 2px;
-	border-radius: 8px;
-	transition: background-color 50ms,
-				transform 100ms;
-}
-
-#keyboard button:active {
-	background-color: gray;
-	transform: scale(0.8);
+music-stave::part(nextNote) {
+	stroke: black;
+	/* fill: #f3d2aa; */
+	fill: white;
 }
 
 svg {
 	height: 30vh;
 	width: 75vw;
-	border: black solid 1px;
+	border: black solid 2px;
 	align-self: center;
+	margin-bottom: 5vh;
 }
-
 
 svg .key.normal {
 	fill: ivory;
+	
 }
 
 svg .key.accent {
 	fill: #333333;
+
 }
 
 svg .key:hover {
