@@ -107,7 +107,8 @@ svg .key.accent {
 	fill: #333333;
 
 }
-
-svg .key:hover {
-	fill: royalblue;
+@media (any-hover: hover) {
+	svg .key:hover {
+		fill: royalblue;
+	}
 }
