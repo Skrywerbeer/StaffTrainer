@@ -57,6 +57,14 @@ body {
 	justify-content: space-around;
 }
 
+#counter {
+	position: absolute;
+	right: 5vw;
+	top: 2vh;
+	font-size: 24pt;
+	font-family: cursive;
+}
+
 music-stave {
 	height: 40vh;
 	margin: 0 5vw;

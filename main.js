@@ -99,6 +99,8 @@ function clickHandler(event) {
         osc.start(audioCtx.currentTime);
         osc.stop(audioCtx.currentTime + TONE_LENGTH);
         noteIndex++;
+        const output = document.getElementById("counter");
+        output.textContent = String(Number(output.textContent) + 1);
     }
     if (noteIndex === NUMBER_OF_NOTES) {
         newGame();
